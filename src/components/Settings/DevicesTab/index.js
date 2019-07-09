@@ -10,6 +10,9 @@ import { addUserDevice, removeUserDevice } from '../../../apis/index';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import CircularLoader from '../../shared/CircularLoader';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Button from '@material-ui/core/Button';
 
 const EmptyDevicesText = styled.div`
   font-size: 24px;
@@ -20,6 +23,11 @@ const EmptyDevicesText = styled.div`
   font-family: 'Roboto', sans-serif;
 `;
 
+const CustomButton = styled(Button)`
+  margin-left: 35px;
+  margin-bottom: 10px;
+`;
+
 class DevicesTab extends React.Component {
   static propTypes = {
     google: PropTypes.object,
@@ -27,12 +35,16 @@ class DevicesTab extends React.Component {
     mapKey: PropTypes.string,
     accessToken: PropTypes.string,
     devices: PropTypes.object,
+    userName: PropTypes.string,
+    email: PropTypes.string,
   };
 
   state = {
     devicesData: [],
     invalidLocationDevices: 0,
     editIdx: null,
+    synchronizePublicSkills: true,
+    synchronizePrivateSkills: false,
   };
 
   componentDidMount() {
@@ -135,9 +147,21 @@ class DevicesTab extends React.Component {
     }
   };
 
+  handleCheck = event => {
+    this.setState({
+      [event.target.name]: event.target.checked,
+    });
+  };
+
   render() {
-    const { devicesData, invalidLocationDevices, editIdx } = this.state;
-    const { google, mapKey } = this.props;
+    const {
+      devicesData,
+      invalidLocationDevices,
+      editIdx,
+      synchronizePublicSkills,
+      synchronizePrivateSkills,
+    } = this.state;
+    const { google, mapKey, devices, email, userName } = this.props;
     return (
       <React.Fragment>
         <SettingsTabWrapper heading="Devices">
@@ -151,6 +175,65 @@ class DevicesTab extends React.Component {
                 handleChange={this.handleChange}
                 tableData={devicesData}
               />
+              <div>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      name="synchronizePublicSkills"
+                      checked={synchronizePublicSkills}
+                      onChange={this.handleCheck}
+                      color="primary"
+                    />
+                  }
+                  label="(Coming Soon) Synchronize local skills with SUSI.AI skills database regularly"
+                />
+                <div>
+                  <CustomButton
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                  >
+                    Synchronize Now
+                  </CustomButton>
+                </div>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      name="synchronizePrivateSkills"
+                      checked={synchronizePrivateSkills}
+                      onChange={this.handleCheck}
+                      color="primary"
+                    />
+                  }
+                  label="(Coming Soon) Synchronize (upload) private skills I create locally with my online account when online"
+                />
+                <div>
+                  <CustomButton
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                  >
+                    Upload Now
+                  </CustomButton>
+                </div>
+              </div>
+              <div>
+                {!devices ? (
+                  <Button variant="contained" color="primary" size="small">
+                    Link SUSI.AI account with device
+                  </Button>
+                ) : (
+                  <div>
+                    <b>
+                      Device linked to SUSI.AI account{' '}
+                      {userName !== '' ? userName : email}
+                    </b>{' '}
+                    <Button variant="contained" color="primary" size="small">
+                      Unlink
+                    </Button>
+                  </div>
+                )}
+              </div>
               <div>
                 <div style={{ maxHeight: '300px', marginTop: '10px' }}>
                   {mapKey && (
@@ -186,6 +269,8 @@ function mapStateToProps(store) {
     mapKey: store.app.apiKeys.mapKey || '',
     accessToken: store.app.accessToken || '',
     devices: store.settings.devices,
+    email: store.app.email,
+    userName: store.settings.userName,
   };
 }
 

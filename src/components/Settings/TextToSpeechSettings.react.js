@@ -21,6 +21,8 @@ const PlayButtonContainer = styled.div`
   }
 `;
 
+const serviceMenu = ['Google', 'IBM Watson'];
+
 class TextToSpeechSettings extends Component {
   constructor(props) {
     super(props);
@@ -31,6 +33,8 @@ class TextToSpeechSettings extends Component {
       playExample: false,
       ttsLanguage: this.props.lang,
       voiceList: speechSynthesis.getVoices(),
+      speechToText: 'Google',
+      textToSpeech: 'Google',
     };
     this.speechSynthesisExample = 'This is an example of speech synthesis';
     this.speechDemo = 'Hi! I am SUSI';
@@ -170,8 +174,30 @@ class TextToSpeechSettings extends Component {
     );
   };
 
+  handleSpeechToText = event => {
+    const { value } = event.target;
+    this.setState({
+      speechToText: value,
+    });
+  };
+
+  handleTextToSpeech = event => {
+    const { value } = event.target;
+    this.setState({
+      textToSpeech: value,
+    });
+  };
+
   render() {
-    const { rate, pitch, playExample, play, ttsLanguage } = this.state;
+    const {
+      rate,
+      pitch,
+      playExample,
+      play,
+      ttsLanguage,
+      speechToText,
+      textToSpeech,
+    } = this.state;
     let voiceOutput = this.populateVoiceList();
     return (
       <div>
@@ -182,6 +208,35 @@ class TextToSpeechSettings extends Component {
           <Select value={voiceOutput.voiceLang} onChange={this.handleTTSVoices}>
             {voiceOutput.voiceMenu}
           </Select>
+        </div>
+        <div>
+          <TabHeading>
+            <Translate text="Speech Recognition and Voice Output on Device" />
+          </TabHeading>
+          <div>
+            Speech to Text:{' '}
+            <Select value={speechToText} onChange={this.handleSpeechToText}>
+              {serviceMenu.map((service, index) => {
+                return (
+                  <MenuItem value={service} key={index}>
+                    {service}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </div>
+          <div>
+            Text to Speech:{' '}
+            <Select value={textToSpeech} onChange={this.handleTextToSpeech}>
+              {serviceMenu.map((service, index) => {
+                return (
+                  <MenuItem value={service} key={index}>
+                    {service}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </div>
         </div>
         <div>
           <TabHeading>
